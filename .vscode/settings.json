@@ -1,0 +1,14 @@
+{
+    "clangd.arguments": [
+        "--compile-commands-dir=${workspaceFolder}/build"
+    ],
+    "cmake.configureArgs": [
+        "-DCMAKE_TOOLCHAIN_FILE=${workspaceFolder}/cmake/gcc-15.cmake",
+        "-G Ninja"
+    ],
+    "clang-format.executable": "/opt/homebrew/opt/llvm/bin/clang-format",
+    "clangd.path": "/opt/homebrew/opt/llvm/bin/clangd",
+    "editor.formatOnSave": true,
+    "editor.renderWhitespace": "all",
+    "editor.trimAutoWhitespace": true
+}
