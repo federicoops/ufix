@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25) # Required for C++26 support
+cmake_minimum_required(VERSION 4.0)
 
 project(ufix
     VERSION 1.0.0
@@ -9,9 +9,10 @@ project(ufix
 set(CMAKE_CXX_STANDARD 26)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
+enable_testing()
 add_compile_options(
     -Wall
+    -Wextra
     -Wextra
     -Wpedantic
     -Werror=return-type
