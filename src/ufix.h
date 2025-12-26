@@ -9,6 +9,10 @@ namespace ufix {
     constexpr inline char SEP   = '=';
     constexpr inline char DELIM = '|';
 
+} // namespace ufix
+
+namespace ufix::view {
+
     struct FieldViewIterator {
         using difference_type = std::ptrdiff_t;
         using value_type      = std::string_view;
@@ -75,12 +79,12 @@ namespace ufix {
         auto kvs() { return tv_map; }
     };
 
-    struct Message {
+    struct MessageView {
       private:
         std::string_view buffer;
 
       public:
-        Message(std::string& str) : buffer(str) {
+        MessageView(std::string& str) : buffer(str) {
             if (buffer.ends_with(ufix::DELIM))
                 buffer.remove_suffix(1);
         }
@@ -90,4 +94,4 @@ namespace ufix {
         FieldViewMap      as_map() const { return FieldViewMap{begin(), end()}; }
     };
 
-} // namespace ufix
+} // namespace ufix::view
