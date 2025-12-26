@@ -10,5 +10,7 @@
     "clangd.path": "/opt/homebrew/opt/llvm/bin/clangd",
     "editor.formatOnSave": true,
     "editor.renderWhitespace": "all",
-    "editor.trimAutoWhitespace": true
+    "editor.trimAutoWhitespace": true,
+    "C_Cpp.default.compilerPath": "/usr/bin/gcc",
+    "C_Cpp.default.cppStandard": "gnu++26"
 }

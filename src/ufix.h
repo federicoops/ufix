@@ -9,7 +9,7 @@ namespace ufix {
     constexpr inline char SEP   = '=';
     constexpr inline char DELIM = '|';
 
-    struct FieldIterator {
+    struct FieldViewIterator {
         using difference_type = std::ptrdiff_t;
         using value_type      = std::string_view;
 
@@ -18,11 +18,11 @@ namespace ufix {
         std::string_view view;
 
       public:
-        FieldIterator() = default;
-        FieldIterator(std::size_t pos, std::string_view msg) : cursor(pos), view(msg) {}
+        FieldViewIterator() = default;
+        FieldViewIterator(std::size_t pos, std::string_view msg) : cursor(pos), view(msg) {}
 
-        FieldIterator& operator++(int) { return ++*this; }
-        FieldIterator& operator++() {
+        FieldViewIterator& operator++(int) { return ++*this; }
+        FieldViewIterator& operator++() {
             cursor = view.find(DELIM, cursor);
             if (cursor != std::string::npos) {
                 cursor += 1;
@@ -38,7 +38,7 @@ namespace ufix {
             return std::string_view(view.begin() + cursor, view.begin() + next);
         }
 
-        bool operator==(const FieldIterator& other) const { return other.view.begin() == view.begin() && other.cursor == cursor; }
+        bool operator==(const FieldViewIterator& other) const { return other.view.begin() == view.begin() && other.cursor == cursor; }
     };
 
     struct FieldView {
@@ -47,7 +47,7 @@ namespace ufix {
 
         FieldView(std::string_view tag, std::string_view value) : tag(tag), value(value) {}
         FieldView(std::string& tag, std::string& value) : tag(tag), value(value) {}
-        FieldView(FieldIterator& it) {
+        FieldView(FieldViewIterator& it) {
             auto view  = *it;
             auto parts = view | std::views::split(ufix::SEP);
             auto pit   = parts.begin();
@@ -60,12 +60,12 @@ namespace ufix {
         }
     };
 
-    struct FieldMap {
+    struct FieldViewMap {
       private:
         std::map<std::string_view, std::string_view> tv_map;
 
       public:
-        FieldMap(FieldIterator begin, FieldIterator end) {
+        FieldViewMap(FieldViewIterator begin, FieldViewIterator end) {
             for (auto it = begin; it != end; ++it) {
                 auto fv = FieldView{it};
                 tv_map.insert({fv.tag, fv.value});
@@ -77,17 +77,17 @@ namespace ufix {
 
     struct Message {
       private:
-        std::string_view raw_message;
+        std::string_view buffer;
 
       public:
-        Message(std::string& str) : raw_message(str) {
-            if (raw_message.ends_with(ufix::DELIM))
-                raw_message.remove_suffix(1);
+        Message(std::string& str) : buffer(str) {
+            if (buffer.ends_with(ufix::DELIM))
+                buffer.remove_suffix(1);
         }
 
-        FieldIterator begin() const { return FieldIterator{0, raw_message}; }
-        FieldIterator end() const { return FieldIterator{std::string::npos, raw_message}; }
-        FieldMap      fields() const { return FieldMap{begin(), end()}; }
+        FieldViewIterator begin() const { return FieldViewIterator{0, buffer}; }
+        FieldViewIterator end() const { return FieldViewIterator{std::string::npos, buffer}; }
+        FieldViewMap      as_map() const { return FieldViewMap{begin(), end()}; }
     };
 
 } // namespace ufix
