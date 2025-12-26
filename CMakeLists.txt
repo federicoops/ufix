@@ -1,9 +1,9 @@
-cmake_minimum_required(VERSION 3.25)  # Required for C++26 support
+cmake_minimum_required(VERSION 3.25) # Required for C++26 support
 
-project(MyProject
+project(ufix
     VERSION 1.0.0
     LANGUAGES CXX
-    DESCRIPTION "C++26 project using GCC 15"
+    DESCRIPTION "micro fix parser"
 )
 
 set(CMAKE_CXX_STANDARD 26)
