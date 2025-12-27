@@ -65,8 +65,10 @@ namespace ufix::view {
     };
 
     struct FieldViewMap {
+        using fv_map_t = std::map<std::string_view, std::string_view>;
+
       private:
-        std::map<std::string_view, std::string_view> tv_map;
+        fv_map_t tv_map;
 
       public:
         FieldViewMap(FieldViewIterator begin, FieldViewIterator end) {
@@ -76,7 +78,7 @@ namespace ufix::view {
             }
         }
 
-        auto kvs() { return tv_map; }
+        const fv_map_t& kvs() const { return tv_map; }
     };
 
     struct MessageView {

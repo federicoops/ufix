@@ -6,7 +6,6 @@ int main() {
     ufix::view::MessageView msg{buf};
 
     auto fm = msg.as_map();
-
     for (auto [k, v] : fm.kvs()) {
         std::println("{}={}", k, v);
     }
