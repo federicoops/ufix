@@ -1,6 +1,6 @@
 # Toolchain file for GCC 15 from Homebrew
 set(CMAKE_SYSTEM_NAME Darwin)
-set(CMAKE_SYSTEM_PROCESSOR arm64)  # or x86_64 for Intel Macs
+set(CMAKE_SYSTEM_PROCESSOR arm64) # or x86_64 for Intel Macs
 
 # Specify the compiler paths
 set(CMAKE_C_COMPILER /opt/homebrew/bin/gcc-15)
@@ -11,7 +11,8 @@ set(CMAKE_OSX_ARCHITECTURES "arm64" CACHE STRING "Build architectures for macOS"
 
 # Compiler flags for GCC on macOS
 set(CMAKE_C_FLAGS_INIT "-fPIC")
-set(CMAKE_CXX_FLAGS_INIT "-fPIC")
+set(CMAKE_CXX_FLAGS_INIT "-fPIC -std=c++26")
+include_directories("/opt/homebrew/Cellar/gcc/15.2.0/include/c++/15")
 
 # Search paths for libraries and headers
 set(CMAKE_FIND_ROOT_PATH /opt/homebrew)

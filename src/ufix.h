@@ -1,5 +1,7 @@
 #include <cassert>
+#include <generator>
 #include <map>
+#include <print>
 #include <ranges>
 #include <string>
 #include <string_view>
@@ -35,6 +37,8 @@ namespace ufix::view {
         }
 
         std::string_view operator*() const {
+            if (cursor == std::string::npos)
+                return {};
             auto next = view.find(ufix::DELIM, cursor);
             if (next == std::string::npos) {
                 return std::string_view(view.begin() + cursor, view.end());
@@ -91,9 +95,16 @@ namespace ufix::view {
                 buffer.remove_suffix(1);
         }
 
-        FieldViewIterator begin() const { return FieldViewIterator{0, buffer}; }
-        FieldViewIterator end() const { return FieldViewIterator{std::string::npos, buffer}; }
-        FieldViewMap      as_map() const { return FieldViewMap{begin(), end()}; }
+        FieldViewIterator         begin() const { return FieldViewIterator{0, buffer}; }
+        FieldViewIterator         end() const { return FieldViewIterator{std::string::npos, buffer}; }
+        FieldViewMap              as_map() const { return FieldViewMap{begin(), end()}; }
+        std::generator<FieldView> as_generator() {
+            auto it = begin();
+            while (*it != "") {
+                co_yield FieldView{it};
+                ++it;
+            }
+        };
     };
 
 } // namespace ufix::view
