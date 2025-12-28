@@ -28,6 +28,7 @@ namespace ufix::view {
         FieldViewIterator(std::size_t pos, std::string_view msg) : cursor(pos), view(msg) {}
 
         FieldViewIterator& operator++(int) { return ++*this; }
+
         FieldViewIterator& operator++() {
             cursor = view.find(DELIM, cursor);
             if (cursor != std::string::npos) {
@@ -56,6 +57,7 @@ namespace ufix::view {
         FieldView(std::string_view tag, std::string_view value) : tag(tag), value(value) {}
         FieldView(std::string& tag, std::string& value) : tag(tag), value(value) {}
         FieldView(std::string_view& sv) : FieldView(FieldViewIterator(0, sv)) {}
+
         FieldView(FieldViewIterator it) {
             auto view  = *it;
             auto parts = view | std::views::split(ufix::SEP);
@@ -86,6 +88,12 @@ namespace ufix::view {
         const fv_map_t& kvs() const { return tv_map; }
     };
 
+    struct MessageView;
+} // namespace ufix::view
+
+template <> struct std::formatter<ufix::view::MessageView>;
+
+namespace ufix::view {
     struct MessageView {
         using sv = std::string_view;
 
@@ -98,9 +106,10 @@ namespace ufix::view {
                 buffer.remove_suffix(1);
         }
 
-        FieldViewIterator         begin() const { return FieldViewIterator{0, buffer}; }
-        FieldViewIterator         end() const { return FieldViewIterator{std::string::npos, buffer}; }
-        FieldViewMap              as_map() const { return FieldViewMap{begin(), end()}; }
+        FieldViewIterator begin() const { return FieldViewIterator{0, buffer}; }
+        FieldViewIterator end() const { return FieldViewIterator{std::string::npos, buffer}; }
+        FieldViewMap      as_map() const { return FieldViewMap{begin(), end()}; }
+
         std::generator<FieldView> as_generator() {
             auto it = begin();
             while (*it != "") {
@@ -108,6 +117,7 @@ namespace ufix::view {
                 ++it;
             }
         };
+
         sv pop() {
             auto it   = buffer.begin();
             auto next = buffer.find(ufix::DELIM);
@@ -115,6 +125,8 @@ namespace ufix::view {
             buffer    = sv{end, buffer.end()};
             return (next != std::string::npos) ? sv{it, end - 1} : sv{it, end};
         }
+
+        friend struct std::formatter<ufix::view::MessageView>;
     };
 
 } // namespace ufix::view
@@ -122,4 +134,9 @@ namespace ufix::view {
 template <> struct std::formatter<ufix::view::FieldView> {
     constexpr auto parse(auto& ctx) { return ctx.begin(); }
     auto           format(const auto& fv, auto& ctx) const { return std::format_to(ctx.out(), "{}={}", fv.tag, fv.value); }
+};
+
+template <> struct std::formatter<ufix::view::MessageView> {
+    constexpr auto parse(auto& ctx) { return ctx.begin(); }
+    auto           format(const auto& msg, auto& ctx) const { return std::format_to(ctx.out(), "{}", msg.buffer); }
 };

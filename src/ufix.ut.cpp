@@ -42,3 +42,10 @@ TEST_CASE("test as_generator") {
         CHECK_NE(fv.value, "");
     }
 }
+
+TEST_CASE("test formatter") {
+    std::string             buf{"8=FIXT1.1|35=A|60=1921042801|10=234"};
+    ufix::view::MessageView msg{buf};
+    std::println("{}", msg);
+    std::println("{}", ufix::view::FieldView{msg.begin()});
+}
