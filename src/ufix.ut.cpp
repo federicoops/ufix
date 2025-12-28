@@ -2,31 +2,43 @@
 #include <print>
 #include <ranges>
 
-int main() {
+#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+#include "doctest.h"
+
+TEST_CASE("test pop") {
+    std::string             buf{"8=FIXT1.1|35=A|60=1921042801|10=234"};
+    ufix::view::MessageView msg{buf};
+    CHECK_EQ(msg.pop(), "8=FIXT1.1");
+    CHECK_EQ(msg.pop(), "35=A");
+    CHECK_EQ(msg.pop(), "60=1921042801");
+    CHECK_EQ(msg.pop(), "10=234");
+    CHECK_EQ(msg.pop(), "");
+}
+
+TEST_CASE("test range_for") {
     std::string             buf{"8=FIXT1.1|35=A|60=1921042801|10=234"};
     ufix::view::MessageView msg{buf};
 
-    std::println("range_for -------------------------------");
     for (auto fv : msg) {
-        std::println("{}", fv);
+        CHECK_NE(fv, "");
     }
+}
 
-    std::println("\nas_map ----------------------------------");
-    auto fm = msg.as_map();
-    for (auto [k, v] : fm.kvs()) {
-        std::println("{}={}", k, v);
+TEST_CASE("test as_map") {
+    std::string             buf{"8=FIXT1.1|35=A|60=1921042801|10=234"};
+    ufix::view::MessageView msg{buf};
+
+    for (auto v : msg.as_map().kvs() | std::views::values) {
+        CHECK_NE(v, "");
     }
+}
 
-    std::println("\nas_generator ----------------------------");
+TEST_CASE("test as_generator") {
+    std::string             buf{"8=FIXT1.1|35=A|60=1921042801|10=234"};
+    ufix::view::MessageView msg{buf};
+
     for (auto fv : msg.as_generator()) {
-        std::println("{}", fv);
+        CHECK_NE(fv.tag, "");
+        CHECK_NE(fv.value, "");
     }
-
-    std::println("\npop ----------------------------");
-    std::println("pop from msg:  {}", msg);
-    std::string_view pop;
-    while (pop = msg.pop(), pop != "") {
-        std::println("pop: {}", ufix::view::FieldView(pop));
-    }
-    std::println("after pop msg: {}", msg);
 }
