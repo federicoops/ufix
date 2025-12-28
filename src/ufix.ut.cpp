@@ -19,6 +19,14 @@ int main() {
 
     std::println("\nas_generator ----------------------------");
     for (auto fv : msg.as_generator()) {
-        std::println("{}={}", fv.tag, fv.value);
+        std::println("{}", fv);
     }
+
+    std::println("\npop ----------------------------");
+    std::println("pop from msg:  {}", msg);
+    std::string_view pop;
+    while (pop = msg.pop(), pop != "") {
+        std::println("pop: {}", ufix::view::FieldView(pop));
+    }
+    std::println("after pop msg: {}", msg);
 }

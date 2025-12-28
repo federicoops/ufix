@@ -55,7 +55,8 @@ namespace ufix::view {
 
         FieldView(std::string_view tag, std::string_view value) : tag(tag), value(value) {}
         FieldView(std::string& tag, std::string& value) : tag(tag), value(value) {}
-        FieldView(FieldViewIterator& it) {
+        FieldView(std::string_view& sv) : FieldView(FieldViewIterator(0, sv)) {}
+        FieldView(FieldViewIterator it) {
             auto view  = *it;
             auto parts = view | std::views::split(ufix::SEP);
             auto pit   = parts.begin();
@@ -86,8 +87,10 @@ namespace ufix::view {
     };
 
     struct MessageView {
+        using sv = std::string_view;
+
       private:
-        std::string_view buffer;
+        sv buffer;
 
       public:
         MessageView(std::string& str) : buffer(str) {
@@ -105,6 +108,18 @@ namespace ufix::view {
                 ++it;
             }
         };
+        sv pop() {
+            auto it   = buffer.begin();
+            auto next = buffer.find(ufix::DELIM);
+            auto end  = (next != std::string::npos) ? it + next + 1 : buffer.end();
+            buffer    = sv{end, buffer.end()};
+            return (next != std::string::npos) ? sv{it, end - 1} : sv{it, end};
+        }
     };
 
 } // namespace ufix::view
+
+template <> struct std::formatter<ufix::view::FieldView> {
+    constexpr auto parse(auto& ctx) { return ctx.begin(); }
+    auto           format(const auto& fv, auto& ctx) const { return std::format_to(ctx.out(), "{}={}", fv.tag, fv.value); }
+};
